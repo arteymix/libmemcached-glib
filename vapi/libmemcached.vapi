@@ -85,6 +85,10 @@ namespace Memcached {
   [IntegerType (rank = 11), CCode (cname = "unsigned long long")]
   public struct ulonglong {}
 
+  // options.h
+  [CCode (cname = "libmemcached_check_configuration")]
+  public Memcached.ReturnCode check_configuration ([CCode (array_length_type = "size_t")] uint8[] option_string, [CCode (array_length_type = "size_t")] uint8[] error_buffer);
+
   // version.h
   public string lib_version ();
 
@@ -202,10 +206,6 @@ namespace Memcached {
     public uint32 generate_hash_value ([CCode (array_length_type = "size_t")] uint8[] key, Memcached.Hash hash_algorithm);
     public uint32 generate_hash ([CCode (array_length_type = "size_t")] uint8[] key);
     public void autoeject ();
-
-    // options.h
-    [CCode (cname = "libmemcached_check_configuration")]
-    public Memcached.ReturnCode check_configuration ([CCode (array_length_type = "size_t")] uint8[] option_string, [CCode (array_length_type = "size_t")] uint8[] error_buffer);
 
     // result.h
     public Memcached.Result result_create (Memcached.Result? result = null);

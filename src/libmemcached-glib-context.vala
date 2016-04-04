@@ -26,9 +26,15 @@ public class MemcachedGLib.Context
 		_context = new Memcached.Context ();
 	}
 
-	public Context.from_configuration (string str)
+	public Context.from_configuration (string str) throws MemcachedGLib.Error
 	{
 		_context = new Memcached.Context.from_configuration (str.data);
+		uint8 err_buf[512];
+		var return_code = Memcached.check_configuration (str.data, err_buf);
+		if (return_code.failed () || return_code.fatal ())
+		{
+			throw new MemcachedGLib.Error.FAILURE ("%s: %s",  _context.strerror (return_code), (string) err_buf);
+		}
 	}
 
 	/**
