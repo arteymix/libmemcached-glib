@@ -1,4 +1,4 @@
-# libmemcached-glib
+# Memcached-GLib
 
 GLib wrapper around libmemcached and libmemcachedutil.
 
