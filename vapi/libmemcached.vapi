@@ -107,7 +107,7 @@ namespace Memcached {
     public void set_user_data<T> (T data);
     public T get_user_data<T> ();
     public Memcached.ReturnCode push (Memcached.Context source);
-    public Memcached.Instance server_instance_by_position (uint32 server_key);
+    public unowned Memcached.Instance server_instance_by_position (uint32 server_key);
     public uint32 server_count ();
     public uint64 query_id ();
 

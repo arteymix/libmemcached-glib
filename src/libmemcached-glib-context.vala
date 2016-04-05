@@ -66,16 +66,25 @@ public class MemcachedGLib.Context : Object
 	/**
 	 * Create a {@link GLib.Source} that emit whenever an instance is meet the
 	 * requested {@link GLib.IOCondition}.
-	 *
-	 * TODO: add child sources from server list
 	 */
-	public Source create_source (IOCondition condition, Cancellable? cancellable = null)
+	public Source create_source (IOCondition condition)
 	{
 		var source = new IdleSource ();
+
+		for (int i = 0; i < _context.server_count (); i++)
+		{
+			unowned Memcached.Instance instance = _context.server_instance_by_position (i);
+			int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
+			if (fd > 0)
+			{
+				source.add_unix_fd (fd, condition);
+			}
+		}
+
 		source.attach (MainContext.@default ());
+
 		return source;
 	}
-
 
 	public uint64 increment (string key, uint32 offset) throws MemcachedGLib.Error
 	{
