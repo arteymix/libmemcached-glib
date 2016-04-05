@@ -71,19 +71,30 @@ public class MemcachedGLib.Context : Object
 	{
 		var source = new IdleSource ();
 
-		for (int i = 0; i < _context.server_count (); i++)
+		lock (_context)
 		{
-			unowned Memcached.Instance instance = _context.server_instance_by_position (i);
-			int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
-			if (fd > 0)
+			for (int i = 0; i < _context.server_count (); i++)
 			{
-				source.add_unix_fd (fd, condition);
+				unowned Memcached.Instance instance = _context.server_instance_by_position (i);
+				int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
+				if (fd > 0)
+				{
+					source.add_unix_fd (fd, condition);
+				}
 			}
 		}
 
 		source.attach (MainContext.@default ());
 
 		return source;
+	}
+
+	public void servers_reset ()
+	{
+		lock (_context)
+		{
+			_context.servers_reset ();
+		}
 	}
 
 	public uint64 increment (string key, uint32 offset) throws MemcachedGLib.Error
@@ -230,6 +241,54 @@ public class MemcachedGLib.Context : Object
 		source.set_callback (fetch_result_async.callback);
 		yield;
 		return fetch_result ();
+	}
+
+	public void set_sasl_auth_data (string username, string password)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.set_sasl_auth_data (username, password));
+	}
+
+	public void destroy_sasl_auth_data ()
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.destroy_sasl_auth_data ());
+	}
+
+	public void server_add_udp (string hostname, Memcached.in_port_t port = Memcached.DEFAULT_PORT)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add_udp (hostname, port));
+	}
+
+	public void server_add_unix_socket (string filename)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add_unix_socket (filename));
+	}
+
+	public void server_add (string hostname, Memcached.in_port_t port = Memcached.DEFAULT_PORT)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add (hostname, port));
+	}
+
+	public void server_add_udp_with_weight (string hostname, uint32 weight, Memcached.in_port_t port = Memcached.DEFAULT_PORT)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add_udp_with_weight (hostname, port, weight));
+	}
+
+	public void server_add_unix_socket_with_weight (string filename, uint32 weight)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add_unix_socket_with_weight (filename, weight));
+	}
+
+	public void server_add_with_weight (string hostname, uint32 weight, Memcached.in_port_t port = Memcached.DEFAULT_PORT)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_add_with_weight (hostname, port, weight));
 	}
 
 	public new void @set (string key, uint8[] @value, time_t expiration, uint32 flags = 0)
