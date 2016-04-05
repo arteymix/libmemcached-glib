@@ -163,6 +163,66 @@ public class MemcachedGLib.Context : Object
 		return get_by_key (group_key, key, out flags);
 	}
 
+	public void mget (string[] keys)
+		throws MemcachedGLib.Error
+	{
+		var keys_length = new size_t[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			keys_length[i] = keys[i].length;
+		_handle_return_code (_context.mget ((uint8*[]) keys, keys_length));
+	}
+
+	/**
+	 * @see MemcachedGLib.Context.mget
+	 */
+	public async void mget_async (string[] keys, int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (mget_async.callback);
+		yield;
+		mget (keys);
+	}
+
+	public void mget_by_key (string group_key, string[] keys)
+		throws MemcachedGLib.Error
+	{
+		var keys_length = new size_t[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			keys_length[i] = keys[i].length;
+		_handle_return_code (_context.mget_by_key (group_key.data, (uint8*[]) keys, keys_length));
+	}
+
+	public async void mget_by_key_async (string group_key, string[] keys, int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (mget_by_key_async.callback);
+		yield;
+		mget_by_key (group_key, keys);
+	}
+
+	public Memcached.Result? fetch_result ()
+		throws MemcachedGLib.Error
+	{
+		Memcached.ReturnCode return_code;
+		var result = _context.fetch_result (null, out return_code);
+		_handle_return_code (return_code);
+		return result;
+	}
+
+	public async Memcached.Result? fetch_result_async (int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.IN);
+		source.set_priority (priority);
+		source.set_callback (fetch_result_async.callback);
+		yield;
+		return fetch_result ();
+	}
+
 	public new void @set (string key, uint8[] @value, time_t expiration, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
