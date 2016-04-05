@@ -17,7 +17,7 @@
 
 using GLib;
 
-public class MemcachedGLib.Context
+public class MemcachedGLib.Context : Object
 {
 	private Memcached.Context _context;
 
@@ -63,7 +63,20 @@ public class MemcachedGLib.Context
 		return (owned) _context;
 	}
 
-	public uint8[] @get (string key, out uint32? flags = null) throws MemcachedGLib.Error
+	/**
+	 * Create a {@link GLib.Source} that emit whenever an instance is meet the
+	 * requested {@link GLib.IOCondition}.
+	 *
+	 * TODO: add child sources from server list
+	 */
+	public Source create_source (IOCondition condition, Cancellable? cancellable = null)
+	{
+		var source = new IdleSource ();
+		source.attach (MainContext.@default ());
+		return source;
+	}
+
+	public new uint8[] @get (string key, out uint32? flags = null) throws MemcachedGLib.Error
 	{
 		Memcached.ReturnCode return_code;
 		var ret = _context.@get (key.data, out flags, out return_code);
@@ -71,10 +84,14 @@ public class MemcachedGLib.Context
 		return ret;
 	}
 
-	public async uint8[] get_async (string key, int priority = GLib.Priority.DEFAULT, out uint32? flags = null)
+	public async uint8[] get_async (string      key,
+	                                int         priority = GLib.Priority.DEFAULT,
+	                                out uint32? flags    = null)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (get_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (get_async.callback);
 		yield;
 		return @get (key, out flags);
 	}
@@ -90,16 +107,18 @@ public class MemcachedGLib.Context
 
 	public async uint8[] get_by_key_async (string group_key,
 	                                       string key,
-	                                       int    priority      = GLib.Priority.DEFAULT,
-	                                       out    uint32? flags = null)
+	                                       int    priority          = GLib.Priority.DEFAULT,
+	                                       out    uint32? flags     = null)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (get_by_key_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (get_by_key_async.callback);
 		yield;
 		return get_by_key (group_key, key, out flags);
 	}
 
-	public void @set (string key, uint8[] @value, time_t expiration, uint32 flags = 0)
+	public new void @set (string key, uint8[] @value, time_t expiration, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
 		_handle_return_code (_context.@set (key.data, @value, expiration, flags));
@@ -115,9 +134,42 @@ public class MemcachedGLib.Context
 	                              int     priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (@set_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (set_async.callback);
 		yield;
 		@set (key, @value, expiration, flags);
+	}
+
+	/**
+	 *
+	 */
+	public void set_by_key (string  group_key,
+	                        string  key,
+	                        uint8[] @value,
+	                        time_t  expiration,
+	                        uint32  flags = 0)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.set_by_key (group_key.data, key.data, @value, expiration, flags));
+	}
+
+	/**
+	 * @see MemcachedGLib.Context.set_by_key
+	 */
+	public async void set_by_key_async (string  group_key,
+	                                    string  key,
+	                                    uint8[] @value,
+	                                    time_t  expiration,
+	                                    uint8   flags,
+	                                    int     priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (set_by_key_async.callback);
+		yield;
+		set_by_key (group_key, key, @value, expiration, flags);
 	}
 
 	public void cas (string key, uint8[] @value, time_t expiration, uint64 cas, uint32 flags = 0)
@@ -134,10 +186,12 @@ public class MemcachedGLib.Context
 	                             time_t  expiration,
 	                             uint64  cas,
 	                             uint32  flags    = 0,
-						         int     priority = GLib.Priority.DEFAULT)
+	                             int     priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (cas_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (cas_async.callback);
 		yield;
 		this.cas (key, @value, expiration, cas, flags);
 	}
@@ -165,37 +219,13 @@ public class MemcachedGLib.Context
 	                                    int     priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (cas_by_key_async.callback, priority);
-		yield;
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (cas_by_key_async.callback);
 		cas_by_key (group_key, key, @value, expiration, cas, flags);
 	}
 
-	/**
-	 *
-	 */
-	public void set_by_key (string group_key, string key, uint8[] @value, time_t expiration, uint32 flags = 0)
-		throws MemcachedGLib.Error
-	{
-		_handle_return_code (_context.set_by_key (group_key.data, key.data, @value, expiration, flags));
-	}
-
-	/**
-	 * @see MemcachedGLib.Context.set_by_key
-	 */
-	public async void set_by_key_async (string  group_key,
-	                                    string  key,
-	                                    uint8[] @value,
-	                                    time_t  expiration,
-	                                    uint8   flags,
-	                                    int     priority = GLib.Priority.DEFAULT)
-		throws MemcachedGLib.Error
-	{
-		GLib.Idle.add (set_by_key_async.callback, priority);
-		yield;
-		set_by_key (group_key, key, @value, expiration, flags);
-	}
-
-	public void @delete (string key)
+	public new void @delete (string key)
 		throws MemcachedGLib.Error
 	{
 		_handle_return_code (_context.@delete (key.data, 0));
@@ -204,7 +234,9 @@ public class MemcachedGLib.Context
 	public async void delete_async (string key, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (delete_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (delete_async.callback);
 		yield;
 		@delete (key);
 	}
@@ -215,10 +247,14 @@ public class MemcachedGLib.Context
 		_handle_return_code (_context.@delete_by_key (group_key.data, key.data, 0));
 	}
 
-	public async void delete_by_key_async (string group_key, string key, int priority = GLib.Priority.DEFAULT)
+	public async void delete_by_key_async (string group_key,
+	                                       string key,
+	                                       int    priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		GLib.Idle.add (delete_by_key_async.callback, priority);
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (delete_by_key_async.callback);
 		yield;
 		@delete_by_key (group_key, key);
 	}
