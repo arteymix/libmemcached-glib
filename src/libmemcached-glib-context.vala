@@ -76,6 +76,51 @@ public class MemcachedGLib.Context : Object
 		return source;
 	}
 
+
+	public uint64 increment (string key, uint32 offset) throws MemcachedGLib.Error
+	{
+		uint64 result;
+		_handle_return_code (_context.increment (key.data, offset, out result));
+		return result;
+	}
+
+	/**
+	 * @see MemcachedGLib.Context.increment
+	 */
+	public async uint64 increment_async (string key,
+	                                     uint32 offset,
+	                                     int    priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (increment_async.callback);
+		yield;
+		return increment (key, offset);
+	}
+
+	public uint64 decrement (string key, uint32 offset) throws MemcachedGLib.Error
+	{
+		uint64 result;
+		_handle_return_code (_context.decrement (key.data, offset, out result));
+		return result;
+	}
+
+	/**
+	 * @see MemcachedGLib.Context.increment
+	 */
+	public async uint64 decrement_async (string key,
+	                                     uint32 offset,
+	                                     int    priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		var source = create_source (IOCondition.OUT);
+		source.set_priority (priority);
+		source.set_callback (decrement_async.callback);
+		yield;
+		return decrement (key, offset);
+	}
+
 	public new uint8[] @get (string key, out uint32? flags = null) throws MemcachedGLib.Error
 	{
 		Memcached.ReturnCode return_code;
