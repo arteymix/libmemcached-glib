@@ -10,5 +10,6 @@ gio = dependency('gio-2.0')
 memcached = dependency('libmemcached')
 
 subdir('src')
+subdir('benchmarks')
 subdir('tests')
 subdir('vapi')
