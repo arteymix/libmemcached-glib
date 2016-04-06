@@ -30,11 +30,7 @@ public class MemcachedGLib.Context : Object
 	{
 		_context = new Memcached.Context.from_configuration (str.data);
 		uint8 err_buf[512];
-		var return_code = Memcached.check_configuration (str.data, err_buf);
-		if (return_code.failed () || return_code.fatal ())
-		{
-			throw new MemcachedGLib.Error.FAILURE ("%s: %s",  _context.strerror (return_code), (string) err_buf);
-		}
+		_handle_return_code (Memcached.check_configuration (str.data, err_buf), (string) err_buf);
 	}
 
 	/**
@@ -45,11 +41,11 @@ public class MemcachedGLib.Context : Object
 		_context = (owned) ctx;
 	}
 
-	internal inline void _handle_return_code (Memcached.ReturnCode return_code) throws MemcachedGLib.Error
+	internal inline void _handle_return_code (Memcached.ReturnCode return_code, string? message = null) throws MemcachedGLib.Error
 	{
 		if (return_code.failed () || return_code.fatal ())
 		{
-			var error = new MemcachedGLib.Error.FAILURE ("%s", _context.last_error_message ());
+			var error = new MemcachedGLib.Error.FAILURE ("%s", message ?? _context.last_error_message ());
 			error.code = return_code;
 			throw error;
 		}
