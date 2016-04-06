@@ -1,6 +1,7 @@
 memcached_glib_sources = [
     'libmemcached-glib.vala',
     'libmemcached-glib-context.vala',
+    'libmemcached-glib-context-source.vala',
     'libmemcached-glib-error.vala'
 ]
 memcached_glib_lib = shared_library('memcached-glib', memcached_glib_sources,

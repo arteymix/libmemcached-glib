@@ -64,29 +64,16 @@ public class MemcachedGLib.Context : Object
 	}
 
 	/**
-	 * Create a {@link GLib.Source} that emit whenever an instance is meet the
-	 * requested {@link GLib.IOCondition}.
+	 * Create a {@link GLib.Source} that emit whenever an instance meets the
+	 * provided {@link GLib.IOCondition}.
 	 */
 	public Source create_source (IOCondition condition)
 	{
-		var source = new IdleSource ();
-
-		lock (_context)
-		{
-			for (int i = 0; i < _context.server_count (); i++)
-			{
-				unowned Memcached.Instance instance = _context.server_instance_by_position (i);
-				int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
-				if (fd > 0)
-				{
-					source.add_unix_fd (fd, condition);
-				}
-			}
+		lock (_context) {
+			var source = new ContextSource (_context, condition);
+			source.attach (MainContext.@default ());
+			return source;
 		}
-
-		source.attach (MainContext.@default ());
-
-		return source;
 	}
 
 	public void servers_reset ()
