@@ -49,7 +49,7 @@ public class MemcachedGLib.Context : Object
 	{
 		if (return_code.failed () || return_code.fatal ())
 		{
-			var error = new MemcachedGLib.Error.FAILURE ("%s: %s", _context.strerror (return_code), _context.last_error_message ());
+			var error = new MemcachedGLib.Error.FAILURE ("%s", _context.last_error_message ());
 			error.code = return_code;
 			throw error;
 		}
