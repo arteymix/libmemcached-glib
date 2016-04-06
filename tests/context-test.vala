@@ -1,3 +1,20 @@
+/*
+ * This file is part of Memcached-GLib.
+ *
+ * Memcached-GLib is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation, either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * Memcached-GLib is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * Memcached-GLib.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 using GLib;
 using MemcachedGLib;
 
@@ -5,7 +22,7 @@ public int main (string[] args)
 {
 	Test.init (ref args);
 
-	Test.add_func ("/context", () =>
+	Test.add_func ("/basic", () =>
 	{
 		try
 		{
@@ -13,11 +30,15 @@ public int main (string[] args)
 
 			ctx.@set ("somekey", "some value".data, 0, 27);
 
+			assert (ctx.exist ("somekey"));
+
 			uint32 flags;
 			assert ("some value" == (string) ctx.@get ("somekey", out flags));
 			assert (27 == flags);
 
 			ctx.@delete ("somekey");
+
+			assert (!ctx.exist ("somekey"));
 
 			try
 			{
@@ -35,7 +56,30 @@ public int main (string[] args)
 		}
 	});
 
-	Test.add_func ("/context/async", () =>
+	Test.add_func ("/mget", () =>
+	{
+		try
+		{
+			var ctx = new Context.from_configuration ("--SERVER=localhost:11211");
+
+			ctx.set ("a", "1".data, 0);
+			ctx.set ("ab", "2".data, 0);
+			ctx.set ("abc", "3".data, 0);
+
+			ctx.mget ({"a", "ab", "abc"});
+
+			assert ("1" == (string) ctx.fetch_result ().value ());
+			assert ("2" == (string) ctx.fetch_result ().value ());
+			assert ("3" == (string) ctx.fetch_result ().value ());
+		}
+		catch (MemcachedGLib.Error err)
+		{
+			message (err.message);
+			assert_not_reached ();
+		}
+	});
+
+	Test.add_func ("/async", () =>
 	{
 		try
 		{
