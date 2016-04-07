@@ -117,13 +117,13 @@ namespace Memcached {
     public void* get_memory_allocator_context ();
 
     // analyze.h
-    public Memcached.Analysis analyze (Memcached.Stat memc_stat, out Memcached.ReturnCode error);
+    public Memcached.Analysis? analyze (Memcached.Stat memc_stat, out Memcached.ReturnCode error);
 
     // auto.h
     public Memcached.ReturnCode increment ([CCode (array_length_type = "size_t")] uint8[] key, uint32 offset, out uint64 value);
     public Memcached.ReturnCode decrement ([CCode (array_length_type = "size_t")] uint8[] key, uint32 offset, out uint64 value);
-    public Memcached.ReturnCode increment_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t")] uint8[] key, uint64 offset, out uint64 value);
-    public Memcached.ReturnCode decrement_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t")] uint8[] key, uint64 offset, out uint64 value);
+    public Memcached.ReturnCode increment_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t")] uint8[] key, uint32 offset, out uint64 value);
+    public Memcached.ReturnCode decrement_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t")] uint8[] key, uint32 offset, out uint64 value);
     public Memcached.ReturnCode increment_with_initial ([CCode (array_length_type = "size_t")] uint8[] key, uint64 offset, uint64 initial, time_t expiration, out uint64 value);
     public Memcached.ReturnCode decrement_with_initial ([CCode (array_length_type = "size_t")] uint8[] key, uint64 offset, uint64 initial, time_t expiration, out uint64 value);
     public Memcached.ReturnCode increment_with_initial_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t")] uint8[] key, uint64 offset, uint64 initial, time_t expiration, out uint64 value);
@@ -138,7 +138,7 @@ namespace Memcached {
     public Memcached.Hash get_key_hash ();
     public Memcached.ReturnCode set_distribution_hash (Memcached.Hash type);
     public Memcached.Hash get_distribution_hash ();
-    public Memcached.ReturnCode bucket_set (uint32[] host_map, uint32[] forward_map, uint32 buckets, uint32 replicas);
+    public Memcached.ReturnCode bucket_set ([CCode (array_length = false)] uint32[] host_map, [CCode (array_length = false)] uint32[] forward_map, uint32 buckets, uint32 replicas);
 
     // callback.h
     public Memcached.ReturnCode callback_set<T> (Memcached.Callback flag, T data);
@@ -220,8 +220,8 @@ namespace Memcached {
     public Memcached.ReturnCode server_cursor (owned Memcached.ServerCallback function) {
       return this._server_cursor (ref function, 1);
     }
-    public Memcached.Instance server_by_key ([CCode (array_length_type = "size_t")] uint8[] key, out Memcached.ReturnCode error);
-    public Memcached.Instance server_get_last_disconnected ();
+    public unowned Memcached.Instance? server_by_key ([CCode (array_length_type = "size_t")] uint8[] key, out Memcached.ReturnCode error);
+    public unowned Memcached.Instance? server_get_last_disconnect ();
     public Memcached.ReturnCode server_add_udp (string hostname, in_port_t port = Memcached.DEFAULT_PORT);
     public Memcached.ReturnCode server_add_unix_socket (string filename);
     public Memcached.ReturnCode server_add (string hostname, in_port_t port = Memcached.DEFAULT_PORT);
@@ -234,8 +234,9 @@ namespace Memcached {
 
     // stat.h
     public void stat_free (Memcached.Stat memc_stat);
-    public Memcached.Stat stat (string args, out Memcached.ReturnCode error);
-    public string stat_get_value (Memcached.Stat memc_stat, out Memcached.ReturnCode error);
+    public Memcached.Stat? stat (string args, out Memcached.ReturnCode error);
+    public string stat_get_value (Memcached.Stat memc_stat, string key, out Memcached.ReturnCode error);
+    [CCode (array_null_terminated = true)]
     public string[] stat_get_keys (Memcached.Stat memc_stat, out Memcached.ReturnCode error);
     public Memcached.ReturnCode stat_execute (string args, Memcached.StatCallback func);
 
@@ -278,9 +279,9 @@ namespace Memcached {
   }
 
   // type/analysis.h
-  [SimpleType, CCode (cname = "memcached_analysis_st", free_function = "memcached_analyze_free")]
+  [CCode (cname = "memcached_analysis_st", has_copy_function = false, free_function = "memcached_analyze_free")]
   public struct Analysis {
-    public Memcached.Context root;
+    public unowned Memcached.Context root;
     public uint32 average_item_size;
     public uint32 longest_uptime;
     public uint32 least_free_server;
@@ -510,7 +511,7 @@ namespace Memcached {
   }
 
   // stat.h
-  [CCode (cname = "memcached_stat_st")]
+  [CCode (cname = "memcached_stat_st", has_copy_function = false)]
   public struct Stat {
     ulong connection_structures;
     ulong curr_connections;
@@ -537,6 +538,8 @@ namespace Memcached {
     ulonglong limit_maxbytes;
     uint8 version[Memcached.VERSION_STRING_LENGTH];
     void* __future;
-    Memcached.Context root;
+    unowned Memcached.Context root;
+
+    public Memcached.ReturnCode servername (string args, string hostname, in_port_t port);
   }
 }
