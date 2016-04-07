@@ -52,13 +52,11 @@ public class MemcachedGLib.Context : Object
 	}
 
 	/**
-	 * Wait for a condition on any instance.
-	 *
-	 * TODO: reuse the same source
+	 * Helper to poll the context for readiness.
 	 */
-	internal async void _wait_for_condition_async (IOCondition condition, int priority)
+	internal async void _wait_for_condition_async (int priority)
 	{
-		var source = create_source (condition);
+		var source = create_source ();
 		source.set_priority (priority);
 		source.set_callback (_wait_for_condition_async.callback);
 		yield;
@@ -76,13 +74,11 @@ public class MemcachedGLib.Context : Object
 	 * Create a {@link GLib.Source} that emit whenever an instance meets the
 	 * provided {@link GLib.IOCondition}.
 	 */
-	public Source create_source (IOCondition condition)
+	public Source create_source ()
 	{
-		lock (_context) {
-			var source = new ContextSource (_context, condition);
-			source.attach (MainContext.@default ());
-			return source;
-		}
+		var source = new ContextSource (_context);
+		source.attach (MainContext.@default ());
+		return source;
 	}
 
 	public void servers_reset ()
@@ -108,7 +104,7 @@ public class MemcachedGLib.Context : Object
 	                                     int    priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return increment (key, offset);
 	}
 
@@ -127,7 +123,7 @@ public class MemcachedGLib.Context : Object
 	                                     int    priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return decrement (key, offset);
 	}
 
@@ -160,7 +156,7 @@ public class MemcachedGLib.Context : Object
 	public async bool exist_async (string key, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return exist (key);
 	}
 
@@ -182,7 +178,7 @@ public class MemcachedGLib.Context : Object
 	public async bool exist_by_key_async (string group_key, string key, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return exist_by_key (group_key, key);
 	}
 
@@ -195,7 +191,7 @@ public class MemcachedGLib.Context : Object
 	public async void delete_async (string key, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		@delete (key);
 	}
 
@@ -210,7 +206,7 @@ public class MemcachedGLib.Context : Object
 	                                       int    priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		delete_by_key (group_key, key);
 	}
 
@@ -223,7 +219,7 @@ public class MemcachedGLib.Context : Object
 	public async void flush_async (time_t expiration, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		flush (expiration);
 	}
 
@@ -240,7 +236,7 @@ public class MemcachedGLib.Context : Object
 	                                out uint32? flags    = null)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return @get (key, out flags);
 	}
 
@@ -259,7 +255,7 @@ public class MemcachedGLib.Context : Object
 	public async void mget_async (string[] keys, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		mget (keys);
 	}
 
@@ -278,7 +274,7 @@ public class MemcachedGLib.Context : Object
 	                                       out    uint32? flags     = null)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		return get_by_key (group_key, key, out flags);
 	}
 
@@ -294,7 +290,7 @@ public class MemcachedGLib.Context : Object
 	public async void mget_by_key_async (string group_key, string[] keys, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		mget_by_key (group_key, keys);
 	}
 
@@ -310,7 +306,7 @@ public class MemcachedGLib.Context : Object
 	public async Memcached.Result? fetch_result_async (int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.IN, priority);
+		yield _wait_for_condition_async (priority);
 		return fetch_result ();
 	}
 
@@ -378,7 +374,7 @@ public class MemcachedGLib.Context : Object
 	                             int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		@set (key, @value, expiration, flags);
 	}
 
@@ -398,7 +394,7 @@ public class MemcachedGLib.Context : Object
 	                             int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		add (key, @value, expiration, flags);
 	}
 
@@ -418,7 +414,7 @@ public class MemcachedGLib.Context : Object
 	                                 int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		replace (key, @value, expiration, flags);
 	}
 
@@ -438,7 +434,7 @@ public class MemcachedGLib.Context : Object
 	                                int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		append (key, @value, expiration, flags);
 	}
 
@@ -458,7 +454,7 @@ public class MemcachedGLib.Context : Object
 	                                 int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		@prepend (key, @value, expiration, flags);
 	}
 
@@ -479,7 +475,7 @@ public class MemcachedGLib.Context : Object
 	                             int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		this.cas (key, @value, cas, expiration, flags);
 	}
 
@@ -507,7 +503,7 @@ public class MemcachedGLib.Context : Object
 	                                    int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		set_by_key (group_key, key, @value, expiration, flags);
 	}
 
@@ -535,7 +531,7 @@ public class MemcachedGLib.Context : Object
 	                                    int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		add_by_key (group_key, key, @value, expiration, flags);
 	}
 
@@ -563,7 +559,7 @@ public class MemcachedGLib.Context : Object
 	                                       int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		append_by_key (group_key, key, @value, expiration, flags);
 	}
 
@@ -591,7 +587,7 @@ public class MemcachedGLib.Context : Object
 	                                        int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		prepend_by_key (group_key, key, @value, expiration, flags);
 	}
 
@@ -618,7 +614,7 @@ public class MemcachedGLib.Context : Object
 	                                    int     priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		cas_by_key (group_key, key, @value, cas, expiration, flags);
 	}
 
@@ -631,7 +627,7 @@ public class MemcachedGLib.Context : Object
 	public async void touch_async (string key, time_t expiration = 0, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		touch (key, expiration);
 	}
 
@@ -647,7 +643,7 @@ public class MemcachedGLib.Context : Object
 	                                      int priority      = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
-		yield _wait_for_condition_async (IOCondition.OUT, priority);
+		yield _wait_for_condition_async (priority);
 		touch_by_key (group_key, key, expiration);
 	}
 }

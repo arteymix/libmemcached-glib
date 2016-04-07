@@ -18,27 +18,32 @@
 using GLib;
 
 /**
- * Simple {@link GLib.Source} to setup polling on a {@link Memcached.Context}
- * for a set of I/O conditions.
+ * Source that emit whenever a {@link Memcached.Context} is ready to receive
+ * an operation.
+ *
+ * To perform more complex I/O, see {@link GLib.IOSchedulerJob}.
  */
 public class MemcachedGLib.ContextSource : Source
 {
-	public ContextSource (Memcached.Context context, IOCondition condition)
+	internal unowned Memcached.Context _context;
+
+	public ContextSource (Memcached.Context context)
 	{
-		for (int i = 0; i < context.server_count (); i++)
-		{
-			unowned Memcached.Instance instance = context.server_instance_by_position (i);
-			int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
-			if (fd > 0)
-			{
-				add_unix_fd (fd, condition);
-			}
-		}
+		_context = context;
 	}
 
 	public override bool prepare (out int timeout)
 	{
 		timeout = -1;
+		for (int i = 0; i < _context.server_count (); i++)
+		{
+			unowned Memcached.Instance instance = _context.server_instance_by_position (i);
+			int fd = ((int[]) instance)[5]; // warning: dirty hack! (see 'instance.hpp')
+			if (fd > 0)
+			{
+				add_unix_fd (fd, IOCondition.OUT);
+			}
+		}
 		return false;
 	}
 
