@@ -204,61 +204,75 @@ public class MemcachedGLib.Context : Object
 		return decrement_by_key (group_key, key, offset);
 	}
 
-	public uint64 increment_with_initial (string key, uint64 offset, uint64 initial = 0, time_t expiration = 0) throws MemcachedGLib.Error
+	public uint64 increment_with_initial (string   key,
+	                                      uint64   offset,
+	                                      uint64   initial    = 0,
+	                                      TimeSpan expiration = 0) throws MemcachedGLib.Error
 	{
 		uint64 result;
-		_handle_return_code (_context.increment_with_initial (key.data, offset, initial, expiration, out result));
+		_handle_return_code (_context.increment_with_initial (key.data,
+		                                                      offset,
+		                                                      initial,
+		                                                      (time_t) (expiration / TimeSpan.SECOND),
+		                                                      out result));
 		return result;
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.increment_with_initial
 	 */
-	public async uint64 increment_with_initial_async (string key,
-	                                                  uint64 offset,
-	                                                  uint64 initial    = 0,
-	                                                  time_t expiration = 0,
-	                                                  int    priority   = GLib.Priority.DEFAULT)
+	public async uint64 increment_with_initial_async (string   key,
+	                                                  uint64   offset,
+	                                                  uint64   initial    = 0,
+	                                                  TimeSpan expiration = 0,
+	                                                  int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		return increment_with_initial (key, offset, initial, expiration);
 	}
 
-	public uint64 decrement_with_initial (string key, uint64 offset, uint64 initial = 0, time_t expiration = 0) throws MemcachedGLib.Error
+	public uint64 decrement_with_initial (string   key,
+	                                      uint64   offset,
+	                                      uint64   initial    = 0,
+	                                      TimeSpan expiration = 0) throws MemcachedGLib.Error
 	{
 		uint64 result;
-		_handle_return_code (_context.decrement_with_initial (key.data, offset, initial, expiration, out result));
+		_handle_return_code (_context.decrement_with_initial (key.data,
+		                                                      offset,
+		                                                      initial,
+		                                                      (time_t) (expiration / TimeSpan.SECOND),
+		                                                      out result));
 		return result;
 	}
 
 	/**destroy_functiondestroy_function
 	 * @see MemcachedGLib.Context.increment_with_initial
 	 */
-	public async uint64 decrement_with_initial_async (string key,
-	                                                  uint64 offset,
-	                                                  uint64 initial    = 0,
-	                                                  time_t expiration = 0,
-	                                                  int    priority   = GLib.Priority.DEFAULT)
+	public async uint64 decrement_with_initial_async (string   key,
+	                                                  uint64   offset,
+	                                                  uint64   initial    = 0,
+	                                                  TimeSpan expiration = 0,
+	                                                  int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		return decrement_with_initial (key, offset, initial, expiration);
 	}
 
-	public uint64 increment_with_initial_by_key (string group_key,
-	                                             string key,
-	                                             uint64 offset,
-	                                             uint64 initial    = 0,
-	                                             time_t expiration = 0)
+	public uint64 increment_with_initial_by_key (string   group_key,
+	                                             string   key,
+	                                             uint64   offset,
+	                                             uint64   initial    = 0,
+	                                             TimeSpan expiration = 0)
 		throws MemcachedGLib.Error
 	{
 		uint64 result;
 		_handle_return_code (_context.increment_with_initial_by_key (group_key.data,
 		                                                             key.data,
 		                                                             offset,
-		                                                             initial,
-		                                                             expiration,
+																	 initial,
+		                                                             (time_t) (expiration / TimeSpan.SECOND),
 		                                                             out result));
 		return result;
 	}
@@ -269,19 +283,20 @@ public class MemcachedGLib.Context : Object
 	public async uint64 increment_with_initial_by_key_async (string group_key,
 	                                                         string key,
 	                                                         uint64 offset,
-	                                                         uint64 initial  = 0,
-	                                                         int    priority = GLib.Priority.DEFAULT)
+	                                                         uint64 initial      = 0,
+	                                                         TimeSpan expiration = 0,
+	                                                         int    priority     = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
-		return increment_with_initial_by_key (group_key, key, offset);
+		return increment_with_initial_by_key (group_key, key, offset, initial, expiration);
 	}
 
-	public uint64 decrement_with_initial_by_key (string group_key,
-	                                             string key,
-	                                             uint64 offset,
-	                                             uint64 initial    = 0,
-	                                             time_t expiration = 0)
+	public uint64 decrement_with_initial_by_key (string   group_key,
+	                                             string   key,
+	                                             uint64   offset,
+	                                             uint64   initial    = 0,
+	                                             TimeSpan expiration = 0)
 		throws MemcachedGLib.Error
 	{
 		uint64 result;
@@ -289,7 +304,7 @@ public class MemcachedGLib.Context : Object
 		                                                             key.data,
 		                                                             offset,
 		                                                             initial,
-		                                                             expiration,
+		                                                             (time_t) (expiration / TimeSpan.SECOND),
 		                                                             out result));
 		return result;
 	}
@@ -297,15 +312,16 @@ public class MemcachedGLib.Context : Object
 	/**
 	 * @see MemcachedGLib.Context.increment_with_initial_by_key
 	 */
-	public async uint64 decrement_with_initial_by_key_async (string group_key,
-	                                                         string key,
-	                                                         uint64 offset,
-												             uint64 initial  = 0,
-	                                                         int    priority = GLib.Priority.DEFAULT)
+	public async uint64 decrement_with_initial_by_key_async (string   group_key,
+	                                                         string   key,
+	                                                         uint64   offset,
+												             uint64   initial    = 0,
+	                                                         TimeSpan expiration = 0,
+	                                                         int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
-		return decrement_with_initial_by_key (group_key, key, offset);
+		return decrement_with_initial_by_key (group_key, key, offset, initial, expiration);
 	}
 
 	public void behavior_set (Memcached.Behavior flag, uint64 data)
@@ -486,13 +502,13 @@ public class MemcachedGLib.Context : Object
 		_context.flush_buffers ();
 	}
 
-	public void flush (time_t expiration)
+	public void flush (TimeSpan expiration)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.flush (expiration));
+		_handle_return_code (_context.flush ((time_t) (expiration / TimeSpan.SECOND)));
 	}
 
-	public async void flush_async (time_t expiration, int priority = GLib.Priority.DEFAULT)
+	public async void flush_async (TimeSpan expiration, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
@@ -606,7 +622,7 @@ public class MemcachedGLib.Context : Object
 		}));
 	}
 
-	public async void mget_execute_async (string[]                            keys,
+	public async void mget_execute_async (owned string[]                      keys,
 	                                      owned MemcachedGLib.ExecuteCallback callback,
 	                                      int                                 priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
@@ -654,8 +670,8 @@ public class MemcachedGLib.Context : Object
 		}));
 	}
 
-	public async void mget_execute_by_key_async (string                              group_key,
-	                                             string[]                            keys,
+	public async void mget_execute_by_key_async (owned string                        group_key,
+	                                             owned string[]                      keys,
 	                                             owned MemcachedGLib.ExecuteCallback callback,
 	                                             int                                 priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
@@ -807,7 +823,7 @@ public class MemcachedGLib.Context : Object
 		_handle_return_code (_context.stat_execute (args, callback));
 	}
 
-	public async void stat_execute_async (string                       args,
+	public async void stat_execute_async (owned string                 args,
 	                                      owned Memcached.StatCallback callback,
 	                                      int                          priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
@@ -835,121 +851,121 @@ public class MemcachedGLib.Context : Object
 			throw error;
 	}
 
-	public new void @set (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)
+	public new void @set (string key, uint8[] @value, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.@set (key.data, @value, expiration, flags));
+		_handle_return_code (_context.@set (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.set
 	 */
-	public async void set_async (string  key,
-	                             uint8[] @value,
-	                             time_t  expiration = 0,
-	                             uint32  flags      = 0,
-	                             int     priority   = GLib.Priority.DEFAULT)
+	public async void set_async (string   key,
+	                             uint8[]  @value,
+	                             TimeSpan expiration = 0,
+	                             uint32   flags      = 0,
+	                             int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		@set (key, @value, expiration, flags);
 	}
 
-	public new void add (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)
+	public new void add (string key, uint8[] @value, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.add (key.data, @value, expiration, flags));
+		_handle_return_code (_context.add (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.add
 	 */
-	public async void add_async (string  key,
-	                             uint8[] @value,
-	                             time_t  expiration = 0,
-	                             uint32  flags      = 0,
-	                             int     priority   = GLib.Priority.DEFAULT)
+	public async void add_async (string   key,
+	                             uint8[]  @value,
+	                             TimeSpan expiration = 0,
+	                             uint32   flags      = 0,
+	                             int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		add (key, @value, expiration, flags);
 	}
 
-	public new void replace (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)
+	public new void replace (string key, uint8[] @value, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.replace (key.data, @value, expiration, flags));
+		_handle_return_code (_context.replace (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.replace
 	 */
-	public async void replace_async (string  key,
-	                                 uint8[] @value,
-	                                 time_t  expiration = 0,
-	                                 uint32  flags      = 0,
-	                                 int     priority   = GLib.Priority.DEFAULT)
+	public async void replace_async (string   key,
+	                                 uint8[]  @value,
+	                                 TimeSpan expiration = 0,
+	                                 uint32   flags      = 0,
+	                                 int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		replace (key, @value, expiration, flags);
 	}
 
-	public new void append (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)
+	public new void append (string key, uint8[] @value, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.append (key.data, @value, expiration, flags));
+		_handle_return_code (_context.append (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.append
 	 */
-	public async void append_async (string  key,
-	                                uint8[] @value,
-	                                time_t  expiration = 0,
-	                                uint32  flags      = 0,
-	                                int     priority   = GLib.Priority.DEFAULT)
+	public async void append_async (string   key,
+	                                uint8[]  @value,
+	                                TimeSpan expiration = 0,
+	                                uint32   flags      = 0,
+	                                int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		append (key, @value, expiration, flags);
 	}
 
-	public new void prepend (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)
+	public new void prepend (string key, uint8[] @value, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.@prepend (key.data, @value, expiration, flags));
+		_handle_return_code (_context.@prepend (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.prepend
 	 */
-	public async void prepend_async (string  key,
-	                                 uint8[] @value,
-	                                 time_t  expiration = 0,
-	                                 uint32  flags      = 0,
-	                                 int     priority   = GLib.Priority.DEFAULT)
+	public async void prepend_async (string   key,
+	                                 uint8[]  @value,
+	                                 TimeSpan expiration = 0,
+	                                 uint32   flags      = 0,
+	                                 int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		@prepend (key, @value, expiration, flags);
 	}
 
-	public void cas (string key, uint8[] @value, uint64 cas, time_t expiration = 0, uint32 flags = 0)
+	public void cas (string key, uint8[] @value, uint64 cas, TimeSpan expiration = 0, uint32 flags = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.cas (key.data, @value, expiration, flags, cas));
+		_handle_return_code (_context.cas (key.data, @value, (time_t) (expiration / TimeSpan.SECOND), flags, cas));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.cas
 	 */
-	public async void cas_async (string  key,
-	                             uint8[] @value,
-	                             uint64  cas,
-	                             time_t  expiration = 0,
-	                             uint32  flags      = 0,
-	                             int     priority   = GLib.Priority.DEFAULT)
+	public async void cas_async (string   key,
+	                             uint8[]  @value,
+	                             uint64   cas,
+	                             TimeSpan expiration = 0,
+	                             uint32   flags      = 0,
+	                             int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
@@ -959,25 +975,29 @@ public class MemcachedGLib.Context : Object
 	/**
 	 *
 	 */
-	public void set_by_key (string  group_key,
-	                        string  key,
-	                        uint8[] @value,
-	                        time_t  expiration = 0,
-	                        uint32  flags      = 0)
+	public void set_by_key (string   group_key,
+	                        string   key,
+	                        uint8[]  @value,
+	                        TimeSpan expiration = 0,
+	                        uint32   flags      = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.@set_by_key (group_key.data, key.data, @value, expiration, flags));
+		_handle_return_code (_context.@set_by_key (group_key.data,
+		                                           key.data,
+					                               @value,
+					                               (time_t) (expiration / TimeSpan.SECOND),
+					                               flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.@set_by_key
 	 */
-	public async void set_by_key_async (string  group_key,
-	                                    string  key,
-	                                    uint8[] @value,
-	                                    time_t  expiration = 0,
-	                                    uint8   flags      = 0,
-	                                    int     priority   = GLib.Priority.DEFAULT)
+	public async void set_by_key_async (string   group_key,
+	                                    string   key,
+	                                    uint8[]  @value,
+	                                    TimeSpan expiration = 0,
+	                                    uint8    flags      = 0,
+	                                    int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
@@ -987,25 +1007,29 @@ public class MemcachedGLib.Context : Object
 	/**
 	 *
 	 */
-	public void add_by_key (string  group_key,
-	                        string  key,
-	                        uint8[] @value,
-	                        time_t  expiration = 0,
-	                        uint32  flags      = 0)
+	public void add_by_key (string   group_key,
+	                        string   key,
+	                        uint8[]  @value,
+	                        TimeSpan expiration = 0,
+	                        uint32   flags      = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.add_by_key (group_key.data, key.data, @value, expiration, flags));
+		_handle_return_code (_context.add_by_key (group_key.data,
+		                                          key.data,
+		                                          @value,
+		                                          (time_t) (expiration / TimeSpan.SECOND),
+		                                          flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.add_by_key
 	 */
-	public async void add_by_key_async (string  group_key,
-	                                    string  key,
-	                                    uint8[] @value,
-	                                    time_t  expiration = 0,
-	                                    uint8   flags      = 0,
-	                                    int     priority   = GLib.Priority.DEFAULT)
+	public async void add_by_key_async (string   group_key,
+	                                    string   key,
+	                                    uint8[]  @value,
+	                                    TimeSpan expiration = 0,
+	                                    uint8    flags      = 0,
+	                                    int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
@@ -1015,25 +1039,29 @@ public class MemcachedGLib.Context : Object
 	/**
 	 *
 	 */
-	public void append_by_key (string  group_key,
-	                           string  key,
-	                           uint8[] @value,
-	                           time_t  expiration = 0,
-	                           uint32  flags      = 0)
+	public void append_by_key (string   group_key,
+	                           string   key,
+	                           uint8[]  @value,
+	                           TimeSpan expiration = 0,
+	                           uint32   flags      = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.append_by_key (group_key.data, key.data, @value, expiration, flags));
+		_handle_return_code (_context.append_by_key (group_key.data,
+		                                             key.data,
+		                                             @value,
+		                                             (time_t) (expiration / TimeSpan.SECOND),
+		                                             flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.append_by_key
 	 */
-	public async void append_by_key_async (string  group_key,
-	                                       string  key,
-	                                       uint8[] @value,
-	                                       time_t  expiration = 0,
-	                                       uint8   flags      = 0,
-	                                       int     priority   = GLib.Priority.DEFAULT)
+	public async void append_by_key_async (string   group_key,
+	                                       string   key,
+	                                       uint8[]  @value,
+	                                       TimeSpan expiration = 0,
+	                                       uint8    flags      = 0,
+	                                       int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
@@ -1043,81 +1071,90 @@ public class MemcachedGLib.Context : Object
 	/**
 	 *
 	 */
-	public void prepend_by_key (string  group_key,
-	                            string  key,
-	                            uint8[] @value,
-	                            time_t  expiration = 0,
-	                            uint32  flags      = 0)
+	public void prepend_by_key (string   group_key,
+	                            string   key,
+	                            uint8[]  @value,
+	                            TimeSpan expiration = 0,
+	                            uint32   flags      = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.prepend_by_key (group_key.data, key.data, @value, expiration, flags));
+		_handle_return_code (_context.prepend_by_key (group_key.data,
+		                                              key.data,
+		                                              @value,
+		                                              (time_t) (expiration / TimeSpan.SECOND),
+		                                              flags));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.prepend_by_key
 	 */
-	public async void prepend_by_key_async (string  group_key,
-	                                        string  key,
-	                                        uint8[] @value,
-	                                        time_t  expiration = 0,
-	                                        uint8   flags      = 0,
-	                                        int     priority   = GLib.Priority.DEFAULT)
+	public async void prepend_by_key_async (string   group_key,
+	                                        string   key,
+	                                        uint8[]  @value,
+	                                        TimeSpan expiration = 0,
+	                                        uint8    flags      = 0,
+	                                        int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		prepend_by_key (group_key, key, @value, expiration, flags);
 	}
 
-	public void cas_by_key (string  group_key,
-	                        string  key,
-	                        uint8[] @value,
-	                        uint64  cas,
-	                        time_t  expiration = 0,
-	                        uint32  flags      = 0)
+	public void cas_by_key (string   group_key,
+	                        string   key,
+	                        uint8[]  @value,
+	                        uint64   cas,
+	                        TimeSpan expiration = 0,
+	                        uint32   flags      = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.cas_by_key (group_key.data, key.data, @value, expiration, flags, cas));
+		_handle_return_code (_context.cas_by_key (group_key.data,
+		                                          key.data,
+		                                          @value,
+		                                          (time_t) (expiration / TimeSpan.SECOND),
+		                                          flags,
+		                                          cas));
 	}
 
 	/**
 	 * @see MemcachedGLib.Context.cas_by_key
 	 */
-	public async void cas_by_key_async (string  group_key,
-	                                    string  key,
-	                                    uint8[] @value,
-	                                    uint64  cas,
-	                                    time_t  expiration = 0,
-	                                    uint32  flags      = 0,
-	                                    int     priority   = GLib.Priority.DEFAULT)
+	public async void cas_by_key_async (string   group_key,
+	                                    string   key,
+	                                    uint8[]  @value,
+	                                    uint64   cas,
+	                                    TimeSpan expiration = 0,
+	                                    uint32   flags      = 0,
+	                                    int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		cas_by_key (group_key, key, @value, cas, expiration, flags);
 	}
 
-	public void touch (string key, time_t expiration = 0)
+	public void touch (string key, TimeSpan expiration = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.touch (key.data, expiration));
+		_handle_return_code (_context.touch (key.data, (time_t) (expiration / TimeSpan.SECOND)));
 	}
 
-	public async void touch_async (string key, time_t expiration = 0, int priority = GLib.Priority.DEFAULT)
+	public async void touch_async (string key, TimeSpan expiration = 0, int priority = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
 		touch (key, expiration);
 	}
 
-	public void touch_by_key (string group_key, string key, time_t expiration = 0)
+	public void touch_by_key (string group_key, string key, TimeSpan expiration = 0)
 		throws MemcachedGLib.Error
 	{
-		_handle_return_code (_context.touch_by_key (group_key.data, key.data, expiration));
+		_handle_return_code (_context.touch_by_key (group_key.data, key.data, (time_t) (expiration / TimeSpan.SECOND)));
 	}
 
-	public async void touch_by_key_async (string group_key,
-	                                      string key,
-	                                      time_t expiration = 0,
-	                                      int priority      = GLib.Priority.DEFAULT)
+	public async void touch_by_key_async (string   group_key,
+	                                      string   key,
+	                                      TimeSpan expiration = 0,
+	                                      int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
 		yield _wait_for_condition_async (priority);
