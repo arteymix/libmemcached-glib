@@ -364,6 +364,49 @@ public class MemcachedGLib.Context : Object
 		delete_by_key (group_key, key);
 	}
 
+	public void dump (owned MemcachedGLib.DumpCallback function)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.dump ((ctx, key) =>
+		{
+			try
+			{
+				function ((string) key);
+				return Memcached.ReturnCode.SUCCESS;
+			}
+			catch (MemcachedGLib.Error err)
+			{
+				return (Memcached.ReturnCode) err.code;
+			}
+		}));
+	}
+
+	public async void dump_async (owned MemcachedGLib.DumpCallback function, int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		MemcachedGLib.Error? error = null;
+		IOSchedulerJob.push ((job) =>
+		{
+			try
+			{
+				dump ((owned) function);
+			}
+			catch (MemcachedGLib.Error _error)
+			{
+				error = _error;
+			}
+			finally
+			{
+				job.send_to_mainloop_async (dump_async.callback);
+			}
+			return true;
+		}, priority);
+		yield;
+		if (error != null)
+			throw error;
+	}
+
 	public void set_encoding_key (string str)
 		throws MemcachedGLib.Error
 	{
@@ -414,6 +457,30 @@ public class MemcachedGLib.Context : Object
 		return exist_by_key (group_key, key);
 	}
 
+	public void fetch_execute (owned MemcachedGLib.ExecuteCallback callback)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.fetch_execute ((ctx, result) =>
+		{
+			try
+			{
+				callback (result);
+				return Memcached.ReturnCode.SUCCESS;
+			}
+			catch (MemcachedGLib.Error err)
+			{
+				return (Memcached.ReturnCode) err.code;
+			}
+		}));
+	}
+
+	public async void fetch_execute_async (owned MemcachedGLib.ExecuteCallback callback, int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		fetch_execute ((owned) callback);
+	}
+
 	public void flush_buffers ()
 	{
 		_context.flush_buffers ();
@@ -449,25 +516,6 @@ public class MemcachedGLib.Context : Object
 		return @get (key, out flags);
 	}
 
-	public void mget (string[] keys)
-		throws MemcachedGLib.Error
-	{
-		var keys_length = new size_t[keys.length];
-		for (int i = 0; i < keys.length; i++)
-			keys_length[i] = keys[i].length;
-		_handle_return_code (_context.mget ((uint8*[]) keys, keys_length));
-	}
-
-	/**
-	 * @see MemcachedGLib.Context.mget
-	 */
-	public async void mget_async (string[] keys, int priority = GLib.Priority.DEFAULT)
-		throws MemcachedGLib.Error
-	{
-		yield _wait_for_condition_async (priority);
-		mget (keys);
-	}
-
 	public uint8[] get_by_key (string group_key, string key, out uint32? flags = null)
 		throws MemcachedGLib.Error
 	{
@@ -485,6 +533,25 @@ public class MemcachedGLib.Context : Object
 	{
 		yield _wait_for_condition_async (priority);
 		return get_by_key (group_key, key, out flags);
+	}
+
+	public void mget (string[] keys)
+		throws MemcachedGLib.Error
+	{
+		var keys_length = new size_t[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			keys_length[i] = keys[i].length;
+		_handle_return_code (_context.mget ((uint8*[]) keys, keys_length));
+	}
+
+	/**
+	 * @see MemcachedGLib.Context.mget
+	 */
+	public async void mget_async (string[] keys, int priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		mget (keys);
 	}
 
 	public void mget_by_key (string group_key, string[] keys)
@@ -519,6 +586,102 @@ public class MemcachedGLib.Context : Object
 		return fetch_result ();
 	}
 
+	public void mget_execute (string[] keys, owned MemcachedGLib.ExecuteCallback callback)
+		throws MemcachedGLib.Error
+	{
+		var keys_length = new size_t[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			keys_length[i] = keys[i].length;
+		_handle_return_code (_context.mget_execute ((uint8*[]) keys, keys_length, (ctx, result) =>
+		{
+			try
+			{
+				callback (result);
+				return Memcached.ReturnCode.SUCCESS;
+			}
+			catch (MemcachedGLib.Error err)
+			{
+				return (Memcached.ReturnCode) err.code;
+			}
+		}));
+	}
+
+	public async void mget_execute_async (string[]                            keys,
+	                                      owned MemcachedGLib.ExecuteCallback callback,
+	                                      int                                 priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		MemcachedGLib.Error? error = null;
+		IOSchedulerJob.push ((job) =>
+		{
+			try
+			{
+				mget_execute (keys, (owned) callback);
+			}
+			catch (MemcachedGLib.Error _error)
+			{
+				error = _error;
+			}
+			finally
+			{
+				job.send_to_mainloop_async (mget_execute_async.callback);
+			}
+			return true;
+		}, priority);
+		yield;
+		if (error != null)
+			throw error;
+	}
+
+	public void mget_execute_by_key (string group_key, string[] keys, owned MemcachedGLib.ExecuteCallback callback)
+		throws MemcachedGLib.Error
+	{
+		var keys_length = new size_t[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			keys_length[i] = keys[i].length;
+		_handle_return_code (_context.mget_execute_by_key (group_key.data, (uint8*[]) keys, keys_length, (ctx, result) =>
+		{
+			try
+			{
+				callback (result);
+				return Memcached.ReturnCode.SUCCESS;
+			}
+			catch (MemcachedGLib.Error err)
+			{
+				return (Memcached.ReturnCode) err.code;
+			}
+		}));
+	}
+
+	public async void mget_execute_by_key_async (string                              group_key,
+	                                             string[]                            keys,
+	                                             owned MemcachedGLib.ExecuteCallback callback,
+	                                             int                                 priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		MemcachedGLib.Error? error = null;
+		IOSchedulerJob.push ((job) => {
+			try
+			{
+				mget_execute_by_key (group_key, keys, (owned) callback);
+			}
+			catch (MemcachedGLib.Error _error)
+			{
+				error = _error;
+			}
+			finally
+			{
+				job.send_to_mainloop_async (mget_execute_by_key_async.callback);
+			}
+			return true;
+		}, priority);
+		yield;
+		if (error != null)
+			throw error;
+	}
+
 	/*
 	public uint32 generate_hash_value (string key, Memcached.Hash hash_algorithm = Memcached.Hash.DEFAULT)
 	{
@@ -546,6 +709,12 @@ public class MemcachedGLib.Context : Object
 		throws MemcachedGLib.Error
 	{
 		_handle_return_code (_context.destroy_sasl_auth_data ());
+	}
+
+	public void server_cursor (owned Memcached.ServerCallback callback)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.server_cursor (callback));
 	}
 
 	public unowned Memcached.Instance? server_by_key (string key)
@@ -630,6 +799,40 @@ public class MemcachedGLib.Context : Object
 		var ret = _context.stat_get_keys (memc_stat, out return_code);
 		_handle_return_code (return_code);
 		return ret;
+	}
+
+	public void stat_execute (string args, owned Memcached.StatCallback callback)
+		throws MemcachedGLib.Error
+	{
+		_handle_return_code (_context.stat_execute (args, callback));
+	}
+
+	public async void stat_execute_async (string                       args,
+	                                      owned Memcached.StatCallback callback,
+	                                      int                          priority = GLib.Priority.DEFAULT)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		MemcachedGLib.Error error = null;
+		IOSchedulerJob.push ((job) =>
+		{
+			try
+			{
+				stat_execute (args, (owned) callback);
+			}
+			catch (MemcachedGLib.Error _error)
+			{
+				error = _error;
+			}
+			finally
+			{
+				job.send_to_mainloop_async (stat_execute_async.callback);
+			}
+			return true;
+		}, priority);
+		yield;
+		if (error != null)
+			throw error;
 	}
 
 	public new void @set (string key, uint8[] @value, time_t expiration = 0, uint32 flags = 0)

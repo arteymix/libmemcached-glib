@@ -2,6 +2,8 @@ project('libmemcached-glib', ['c', 'vala'])
 
 add_global_arguments(['-Wno-deprecated-declarations',
                       '-Wno-unused',
+                      '-Wno-discarded-qualifiers',
+                      '-Wno-incompatible-pointer-types',
                       '-Wno-pointer-sign'], language: 'c')
 
 glib = dependency('glib-2.0')

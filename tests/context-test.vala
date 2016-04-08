@@ -74,9 +74,72 @@ public int main (string[] args)
 		}
 		catch (MemcachedGLib.Error err)
 		{
-			message (err.message);
 			assert_not_reached ();
 		}
+	});
+
+	Test.add_func ("/mget_execute", () =>
+	{
+		try
+		{
+			var ctx = new Context.from_configuration ("--SERVER=localhost:11211");
+
+			ctx.behavior_set (Memcached.Behavior.BINARY_PROTOCOL, 1);
+
+			ctx.set ("a", "1".data, 0);
+			ctx.set ("ab", "2".data, 0);
+			ctx.set ("abc", "3".data, 0);
+
+			var pass = 0;
+			ctx.mget_execute ({"a", "ab", "abc"}, (result) =>
+			{
+				pass++;
+			});
+
+			assert (3 == pass);
+		}
+		catch (MemcachedGLib.Error err)
+		{
+			assert_not_reached ();
+		}
+	});
+
+	Test.add_func ("/mget_execute_async", () =>
+	{
+		var loop = new MainLoop ();
+		try
+		{
+			var ctx = new Context.from_configuration ("--SERVER=localhost:11211");
+
+			ctx.set ("a", "1".data, 0);
+			ctx.set ("ab", "2".data, 0);
+			ctx.set ("abc", "3".data, 0);
+
+			ctx.mget_execute_async.begin ({"a", "ab", "abc"},
+			                              (result) => {},
+			                              GLib.Priority.DEFAULT,
+			                              (obj, result) =>
+			{
+				try
+				{
+					ctx.mget_execute_async.end (result);
+				}
+				catch (MemcachedGLib.Error err)
+				{
+					assert_not_reached ();
+				}
+				finally
+				{
+					loop.quit ();
+				}
+			});
+		}
+		catch (MemcachedGLib.Error err)
+		{
+			assert_not_reached ();
+		}
+
+		loop.run ();
 	});
 
 	Test.add_func ("/async", () =>
@@ -118,6 +181,38 @@ public int main (string[] args)
 			});
 
 			loop.run ();
+		}
+		catch (MemcachedGLib.Error err)
+		{
+			assert_not_reached ();
+		}
+	});
+
+	Test.add_func ("/dump", () => {
+		try
+		{
+			var ctx = new MemcachedGLib.Context.from_configuration ("--SERVER=localhost:11211");
+
+			ctx.set ("a", "b".data);
+
+			ctx.dump ((key) => {});
+		}
+		catch (MemcachedGLib.Error err)
+		{
+			assert_not_reached ();
+		}
+	});
+
+	Test.add_func ("/server_cursor", () =>
+	{
+		try
+		{
+			var ctx = new MemcachedGLib.Context.from_configuration ("--SERVER=localhost");
+
+			ctx.server_cursor ((ctx, instance) => {
+				assert ("localhost" == instance.name ());
+				return Memcached.ReturnCode.SUCCESS;
+			});
 		}
 		catch (MemcachedGLib.Error err)
 		{

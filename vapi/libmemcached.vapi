@@ -74,7 +74,7 @@ namespace Memcached {
   public delegate Memcached.ReturnCode KeyTrigger (Memcached.Context ptr, [CCode (array_length_type = "size_t")] uint8[] key, Memcached.Result result);
   [CCode (cname = "memcached_trigger_delete_key_fn", has_target = false)]
   public delegate Memcached.ReturnCode DeleteKeyTrigger (Memcached.Context ptr, [CCode (array_length_type = "size_t")] uint8[] key);
-  [CCode (cname = "memcached_dump_fn", has_target = false)]
+  [CCode (cname = "memcached_dump_fn")]
   public delegate Memcached.ReturnCode DumpCallback (Memcached.Context ptr, [CCode (array_length_type = "size_t")] uint8[] key);
 
   [SimpleType]
@@ -154,9 +154,11 @@ namespace Memcached {
 
     // dump.h
     [CCode (cname = "memcached_dump")]
-    private Memcached.ReturnCode _dump (ref Memcached.DumpCallback function, uint32 number_of_callbacks);
-    public Memcached.ReturnCode dump (owned Memcached.DumpCallback function) {
-      return this._dump (ref function, 1);
+    private Memcached.ReturnCode _dump (Memcached.DumpCallback function, uint32 number_of_callbacks);
+    [CCode (cname = "memcached_dump_wrapper")]
+    public Memcached.ReturnCode dump (Memcached.DumpCallback function) {
+      var _function = &function;
+      return this._dump ((Memcached.DumpCallback) _function, 1);
     }
 
     // encoding_key.h
@@ -175,9 +177,11 @@ namespace Memcached {
 
     // fetch.h
     [CCode (cname = "memcached_fetch_execute")]
-    private Memcached.ReturnCode _fetch_execute (ref Memcached.ExecuteCallback callback, uint32 number_of_callbacks);
-    public Memcached.ReturnCode fetch_execute (owned Memcached.ExecuteCallback callback) {
-      return this._fetch_execute (ref callback, 1);
+    private Memcached.ReturnCode _fetch_execute (Memcached.ExecuteCallback callback, uint32 number_of_callbacks);
+    [CCode (cname = "memcached_fetch_execute_wrapper")]
+    public Memcached.ReturnCode fetch_execute (Memcached.ExecuteCallback callback) {
+      var _callback = &callback;
+      return this._fetch_execute ((Memcached.ExecuteCallback) _callback, 1);
     }
 
     // flush_buffers.h
@@ -197,13 +201,18 @@ namespace Memcached {
     public uint8[]? fetch ([CCode (array_length_type = "size_t")] uint8[] key, out uint32 flags, out Memcached.ReturnCode error);
     public Memcached.Result? fetch_result (Memcached.Result? result, out Memcached.ReturnCode error);
     [CCode (cname = "memcached_mget_execute")]
-    private Memcached.ReturnCode _mget_execute ([CCode (array_length_type = "size_t", array_length_pos = 2.5)] uint8*[] keys, [CCode (array_length = false)] size_t[] keys_length, ref Memcached.ExecuteCallback function, uint32 number_of_callbacks = 1);
-    public Memcached.ReturnCode mget_execute (uint8*[] keys, size_t[] keys_length, owned Memcached.ExecuteCallback function) {
-      return this._mget_execute (keys, keys_length, ref function, 1);
+    private Memcached.ReturnCode _mget_execute ([CCode (array_length_type = "size_t", array_length_pos = 2.5)] uint8*[] keys, [CCode (array_length = false)] size_t[] keys_length, Memcached.ExecuteCallback function, uint32 number_of_callbacks = 1);
+    [CCode (cname = "memcached_mget_execute_wrapper")]
+    public Memcached.ReturnCode mget_execute (uint8*[] keys, size_t[] keys_length, Memcached.ExecuteCallback function) {
+      var _function = &function;
+      return this._mget_execute (keys, keys_length, (Memcached.ExecuteCallback) _function, 1);
     }
-    public Memcached.ReturnCode _mget_execute_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t", array_length_pos = 3.5)] uint8*[] keys, [CCode (array_length = false)] size_t[] keys_length, ref Memcached.ExecuteCallback function, uint32 number_of_callbacks = 1);
-    public Memcached.ReturnCode mget_execute_by_key (uint8[] group_key, uint8*[] keys, size_t[] keys_length, owned Memcached.ExecuteCallback function) {
-      return this._mget_execute_by_key (group_key, keys, keys_length, ref function, 1);
+	[CCode (cname = "memcached_mget_execute_by_key")]
+    public Memcached.ReturnCode _mget_execute_by_key ([CCode (array_length_type = "size_t")] uint8[] group_key, [CCode (array_length_type = "size_t", array_length_pos = 3.5)] uint8*[] keys, [CCode (array_length = false)] size_t[] keys_length, Memcached.ExecuteCallback function, uint32 number_of_callbacks = 1);
+	[CCode (cname = "memcached_mget_execute_by_key_wrapper")]
+    public Memcached.ReturnCode mget_execute_by_key (uint8[] group_key, uint8*[] keys, size_t[] keys_length, Memcached.ExecuteCallback function) {
+      var _function = &function;
+      return this._mget_execute_by_key (group_key, keys, keys_length, (Memcached.ExecuteCallback) _function, 1);
     }
 
     // hash.h
@@ -220,9 +229,11 @@ namespace Memcached {
 
     // server.h
     [CCode (cname = "memcached_server_cursor")]
-    private Memcached.ReturnCode _server_cursor (ref Memcached.ServerCallback function, uint32 number_of_callbacks);
-    public Memcached.ReturnCode server_cursor (owned Memcached.ServerCallback function) {
-      return this._server_cursor (ref function, 1);
+    private Memcached.ReturnCode _server_cursor (Memcached.ServerCallback function, uint32 number_of_callbacks);
+	[CCode (cname = "memcached_server_cursor_wrapper")]
+    public Memcached.ReturnCode server_cursor (Memcached.ServerCallback function) {
+      var _function = &function;
+      return this._server_cursor ((Memcached.ServerCallback) _function, 1);
     }
     public unowned Memcached.Instance? server_by_key ([CCode (array_length_type = "size_t")] uint8[] key, out Memcached.ReturnCode error);
     public unowned Memcached.Instance? server_get_last_disconnect ();
