@@ -97,6 +97,16 @@ public class MemcachedGLib.Context : Object
 		_context.reset_last_disconnected_server ();
 	}
 
+	public void set_user_data<T> (T data)
+	{
+		_context.set_user_data<T> (data);
+	}
+
+	public T get_user_data<T> ()
+	{
+		return _context.get_user_data<T> ();
+	}
+
 	public uint32 server_count ()
 	{
 		return _context.server_count ();

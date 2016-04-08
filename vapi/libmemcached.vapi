@@ -104,7 +104,9 @@ namespace Memcached {
     public void reset_last_disconnected_server ();
     [CCode (instance_pos = 2)]
     public Memcached.Context clone (Memcached.Context? destination = null);
+    [CCode (simple_generics = true)]
     public void set_user_data<T> (T data);
+    [CCode (simple_generics = true)]
     public T get_user_data<T> ();
     public Memcached.ReturnCode push (Memcached.Context source);
     public unowned Memcached.Instance server_instance_by_position (uint32 server_key);
