@@ -141,7 +141,9 @@ namespace Memcached {
     public Memcached.ReturnCode bucket_set ([CCode (array_length = false)] uint32[] host_map, [CCode (array_length = false)] uint32[] forward_map, uint32 buckets, uint32 replicas);
 
     // callback.h
+    [CCode (simple_generics = true)]
     public Memcached.ReturnCode callback_set<T> (Memcached.Callback flag, T data);
+    [CCode (simple_generics = true)]
     public T callback_get<T> (Memcached.Callback flag, out Memcached.ReturnCode error);
 
     // delete.h
