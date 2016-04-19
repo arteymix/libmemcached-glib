@@ -416,7 +416,7 @@ public class MemcachedGLib.Context : Object
 			{
 				job.send_to_mainloop_async (dump_async.callback);
 			}
-			return true;
+			return false;
 		}, priority);
 		yield;
 		if (error != null)
@@ -643,7 +643,7 @@ public class MemcachedGLib.Context : Object
 			{
 				job.send_to_mainloop_async (mget_execute_async.callback);
 			}
-			return true;
+			return false;
 		}, priority);
 		yield;
 		if (error != null)
@@ -691,7 +691,7 @@ public class MemcachedGLib.Context : Object
 			{
 				job.send_to_mainloop_async (mget_execute_by_key_async.callback);
 			}
-			return true;
+			return false;
 		}, priority);
 		yield;
 		if (error != null)
@@ -844,7 +844,7 @@ public class MemcachedGLib.Context : Object
 			{
 				job.send_to_mainloop_async (stat_execute_async.callback);
 			}
-			return true;
+			return false;
 		}, priority);
 		yield;
 		if (error != null)
