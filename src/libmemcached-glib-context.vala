@@ -17,20 +17,38 @@
 
 using GLib;
 
-public class MemcachedGLib.Context : Object
+public class MemcachedGLib.Context : Object, Initable
 {
+	/**
+	 * The configuration if this has been initialized by {@link Context.from_configuration},
+	 * otherwise 'null' and servers are expected to be attached manually.
+	 */
+	public string? configuration { construct; get; default = null; }
+
 	private Memcached.Context _context;
 
-	public Context ()
+	public Context (string configuration)
 	{
 		_context = new Memcached.Context ();
 	}
 
 	public Context.from_configuration (string str) throws MemcachedGLib.Error
 	{
-		_context = new Memcached.Context.from_configuration (str.data);
+		Object (configuration: str);
+		init ();
+	}
+
+	/**
+	 * Initialize the cache context if a configuration is provided.
+	 */
+	public bool init (Cancellable? cancellable = null) throws MemcachedGLib.Error
+	{
+		if (configuration == null || _context != null)
+			return true;
 		uint8 err_buf[512];
-		_handle_return_code (Memcached.check_configuration (str.data, err_buf), (string) err_buf);
+		_handle_return_code (Memcached.check_configuration (configuration.data, err_buf), (string) err_buf);
+		_context = new Memcached.Context.from_configuration (configuration.data);
+		return true;
 	}
 
 	/**
