@@ -36,9 +36,14 @@ public int main (string[] args)
 			assert ("some value" == (string) ctx.@get ("somekey", out flags));
 			assert (27 == flags);
 
+			assert ("some value" == (string) ctx.lookup ("somekey", out flags));
+			assert (27 == flags);
+
 			ctx.@delete ("somekey");
 
 			assert (!ctx.exist ("somekey"));
+
+			assert (null == ctx.lookup ("somekey"));
 
 			try
 			{

@@ -569,6 +569,51 @@ public class MemcachedGLib.Context : Object, Initable
 		return get_by_key (group_key, key, out flags);
 	}
 
+	public uint8[]? lookup (string key, out uint32? flags = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return @get (key, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			return null;
+		}
+	}
+
+	public async uint8[]? lookup_async (string      key,
+	                                    int         priority = GLib.Priority.DEFAULT,
+	                                    out uint32? flags    = null)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		return lookup (key, out flags);
+	}
+
+	public uint8[]? lookup_by_key (string group_key, string key, out uint32? flags = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return @get_by_key (group_key, key, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			return null;
+		}
+	}
+
+	public async uint8[]? lookup_by_key_async (string group_key,
+	                                           string key,
+	                                           int    priority      = GLib.Priority.DEFAULT,
+	                                           out    uint32? flags = null)
+		throws MemcachedGLib.Error
+	{
+		yield _wait_for_condition_async (priority);
+		return lookup_by_key (group_key, key, out flags);
+	}
+
 	public void mget (string[] keys)
 		throws MemcachedGLib.Error
 	{
