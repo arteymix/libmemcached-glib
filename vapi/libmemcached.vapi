@@ -500,7 +500,7 @@ namespace Memcached {
   public Memcached.ServerList servers_parse (string server_strings);
 
   // server.h
-  [Compact, CCode (cname = "memcached_instance_st", has_type_id = false, lower_case_cprefix = "memcached_server_")]
+  [Compact, CCode (cname = "memcached_server_instance_st", has_type_id = false, lower_case_cprefix = "memcached_server_")]
   public class Instance {
     public uint32 response_count ();
     public unowned string name ();
