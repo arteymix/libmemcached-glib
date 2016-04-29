@@ -1,10 +1,20 @@
-project('libmemcached-glib', ['c', 'vala'])
+project('libmemcached-glib', ['c', 'vala'],
+        version: '1.0.0',
+        meson_version: '>=0.31.0')
 
+if not meson.is_subproject()
 add_global_arguments(['-Wno-deprecated-declarations',
                       '-Wno-unused',
                       '-Wno-discarded-qualifiers',
                       '-Wno-incompatible-pointer-types',
                       '-Wno-pointer-sign'], language: 'c')
+
+add_global_arguments(['--target-glib=2.32',
+                      '--fatal-warnings',
+                      '--enable-deprecated'], language: 'vala')
+endif
+
+meson.add_install_script('install-vapi.sh')
 
 glib = dependency('glib-2.0')
 gobject = dependency('gobject-2.0')
