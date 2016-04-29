@@ -55,7 +55,7 @@ public int main (string[] args)
 
 			}
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}
@@ -77,7 +77,7 @@ public int main (string[] args)
 			assert ("2" == (string) ctx.fetch_result ().value ());
 			assert ("3" == (string) ctx.fetch_result ().value ());
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}
@@ -103,7 +103,7 @@ public int main (string[] args)
 
 			assert (3 == pass);
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}
@@ -129,7 +129,7 @@ public int main (string[] args)
 				{
 					ctx.mget_execute_async.end (result);
 				}
-				catch (MemcachedGLib.Error err)
+				catch (GLib.Error err)
 				{
 					assert_not_reached ();
 				}
@@ -139,7 +139,7 @@ public int main (string[] args)
 				}
 			});
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}
@@ -160,7 +160,7 @@ public int main (string[] args)
 				{
 					ctx.@set_async.end (result);
 				}
-				catch (MemcachedGLib.Error err)
+				catch (GLib.Error err)
 				{
 					assert_not_reached ();
 				}
@@ -174,7 +174,7 @@ public int main (string[] args)
 						assert ("some value" == (string) data);
 						assert (27 == flags);
 					}
-					catch (MemcachedGLib.Error err)
+					catch (GLib.Error err)
 					{
 						assert_not_reached ();
 					}
@@ -187,7 +187,7 @@ public int main (string[] args)
 
 			loop.run ();
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}
@@ -200,10 +200,11 @@ public int main (string[] args)
 
 			ctx.set ("a", "b".data);
 
-			ctx.dump ((key) => {});
+			ctx.dump ((key) => { message (key); });
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
+			message (err.message);
 			assert_not_reached ();
 		}
 	});
@@ -219,7 +220,7 @@ public int main (string[] args)
 				return Memcached.ReturnCode.SUCCESS;
 			});
 		}
-		catch (MemcachedGLib.Error err)
+		catch (GLib.Error err)
 		{
 			assert_not_reached ();
 		}

@@ -32,7 +32,7 @@ public class MemcachedGLib.Context : Object, Initable
 		_context = new Memcached.Context ();
 	}
 
-	public Context.from_configuration (string str) throws MemcachedGLib.Error
+	public Context.from_configuration (string str) throws GLib.Error
 	{
 		Object (configuration: str);
 		init ();
@@ -41,7 +41,7 @@ public class MemcachedGLib.Context : Object, Initable
 	/**
 	 * Initialize the cache context if a configuration is provided.
 	 */
-	public bool init (Cancellable? cancellable = null) throws MemcachedGLib.Error
+	public bool init (Cancellable? cancellable = null) throws GLib.Error
 	{
 		if (configuration == null || _context != null)
 			return true;
