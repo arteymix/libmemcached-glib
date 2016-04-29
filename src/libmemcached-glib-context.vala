@@ -1059,7 +1059,7 @@ public class MemcachedGLib.Context : Object, Initable
 	                                    string   key,
 	                                    uint8[]  @value,
 	                                    TimeSpan expiration = 0,
-	                                    uint8    flags      = 0,
+	                                    uint32   flags      = 0,
 	                                    int      priority   = GLib.Priority.DEFAULT)
 		throws MemcachedGLib.Error
 	{
