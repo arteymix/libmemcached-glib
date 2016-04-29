@@ -569,6 +569,80 @@ public class MemcachedGLib.Context : Object, Initable
 		return get_by_key (group_key, key, out flags);
 	}
 
+	public uint8[] get_or_compute (string key, owned ComputeCallback compute, out uint32? flags = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return @get (key, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			TimeSpan expiration;
+			var @value = compute (out expiration, out flags);
+			@set (key, @value, expiration, flags);
+			return @value;
+		}
+	}
+
+	public async uint8[] get_or_compute_async (string                key,
+	                                           owned ComputeCallback compute,
+	                                           int                   priority = GLib.Priority.DEFAULT,
+	                                           out uint32?           flags    = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return yield @get_async (key, priority, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			TimeSpan expiration;
+			var @value = compute (out expiration, out flags);
+			yield @set_async (key, @value, expiration, flags);
+			return @value;
+		}
+	}
+
+	public uint8[] get_or_compute_by_key (string                group_key,
+	                                      string                key,
+	                                      owned ComputeCallback compute,
+	                                      out uint32?           flags = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return @get_by_key (group_key, key, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			TimeSpan expiration;
+			var @value = compute (out expiration, out flags);
+			@set_by_key (group_key, key, @value, expiration, flags);
+			return @value;
+		}
+	}
+
+	public async uint8[] get_or_compute_by_key_async (string                group_key,
+	                                                  string                key,
+	                                                  owned ComputeCallback compute,
+	                                                  int                   priority = GLib.Priority.DEFAULT,
+	                                                  out uint32?           flags    = null)
+		throws MemcachedGLib.Error
+	{
+		try
+		{
+			return yield @get_by_key_async (group_key, key, priority, out flags);
+		}
+		catch (MemcachedGLib.Error.NOTFOUND err)
+		{
+			TimeSpan expiration;
+			var @value = compute (out expiration, out flags);
+			yield @set_by_key_async (group_key, key, @value, expiration, flags, priority);
+			return @value;
+		}
+	}
+
 	public uint8[]? lookup (string key, out uint32? flags = null)
 		throws MemcachedGLib.Error
 	{

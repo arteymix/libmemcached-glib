@@ -24,4 +24,7 @@ namespace MemcachedGLib
 	public delegate void StatCallback (string key, uint8[] @value) throws MemcachedGLib.Error;
 
 	public delegate void DumpCallback (string key) throws MemcachedGLib.Error;
+
+	public delegate uint8[] ComputeCallback (out TimeSpan? expiration = null,
+	                                         out uint32?   flags      = null);
 }
