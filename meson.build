@@ -1,4 +1,4 @@
-project('libmemcached-glib', ['c', 'vala'],
+project('libmemcached-glib', 'c', 'vala',
         version: '1.0.0',
         meson_version: '>=0.31.0')
 
