@@ -15,15 +15,15 @@
  * Memcached-GLib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace MemcachedGLib
+namespace GMemcached
 {
-	public delegate void ExecuteCallback (Memcached.Result result) throws MemcachedGLib.Error;
+	public delegate void ExecuteCallback (Memcached.Result result) throws GMemcached.Error;
 
-	public delegate void ServerCallback (Memcached.Instance server) throws MemcachedGLib.Error;
+	public delegate void ServerCallback (Memcached.Instance server) throws GMemcached.Error;
 
-	public delegate void StatCallback (string key, uint8[] @value) throws MemcachedGLib.Error;
+	public delegate void StatCallback (string key, uint8[] @value) throws GMemcached.Error;
 
-	public delegate void DumpCallback (string key) throws MemcachedGLib.Error;
+	public delegate void DumpCallback (string key) throws GMemcached.Error;
 
 	public delegate uint8[] ComputeCallback (out TimeSpan? expiration = null,
 	                                         out uint32?   flags      = null);

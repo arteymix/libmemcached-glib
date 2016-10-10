@@ -4,9 +4,9 @@ GLib wrapper around libMemcached.
 
 ```vala
 using GLib;
-using MemcachedGLib;
+using GMemcached;
 
-var context = new MemcachedGLib.from_configuration ("--SERVER=localhost");
+var context = new Context.from_configuration ("--SERVER=localhost");
 
 context.@set ("some_key", "some value".data, TimeSpan.HOUR);
 
@@ -49,7 +49,7 @@ one provided by [Bump](https://github.com/nemequ/bump).
 ```vala
 using Bump;
 using GLib;
-using MemcachedGLib;
+using GMemcached;
 
 var cache_pool = new ResourcePool<Context> ();
 

@@ -23,7 +23,7 @@ using GLib;
  *
  * To perform more complex I/O, see {@link GLib.IOSchedulerJob}.
  */
-public class MemcachedGLib.ContextSource : Source
+public class GMemcached.ContextSource : Source
 {
 	internal unowned Memcached.Context _context;
 

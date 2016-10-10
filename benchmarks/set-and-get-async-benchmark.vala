@@ -1,5 +1,5 @@
 
-using MemcachedGLib;
+using GMemcached;
 
 public int main (string[] args)
 {

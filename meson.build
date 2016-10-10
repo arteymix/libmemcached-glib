@@ -19,7 +19,7 @@ meson.add_install_script('install-vapi.sh')
 glib = dependency('glib-2.0')
 gobject = dependency('gobject-2.0')
 gio = dependency('gio-2.0')
-memcached = dependency('libmemcached')
+libmemcached = dependency('libmemcached')
 
 subdir('src')
 subdir('benchmarks')

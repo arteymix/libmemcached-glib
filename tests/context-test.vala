@@ -16,7 +16,7 @@
  */
 
 using GLib;
-using MemcachedGLib;
+using GMemcached;
 
 public int main (string[] args)
 {
@@ -50,7 +50,7 @@ public int main (string[] args)
 				ctx.@get ("somekey");
 				assert_not_reached ();
 			}
-			catch (MemcachedGLib.Error.NOTFOUND err)
+			catch (GMemcached.Error.NOTFOUND err)
 			{
 
 			}
@@ -196,7 +196,7 @@ public int main (string[] args)
 	Test.add_func ("/dump", () => {
 		try
 		{
-			var ctx = new MemcachedGLib.Context.from_configuration ("--SERVER=localhost:11211");
+			var ctx = new GMemcached.Context.from_configuration ("--SERVER=localhost:11211");
 
 			ctx.set ("a", "b".data);
 
@@ -213,7 +213,7 @@ public int main (string[] args)
 	{
 		try
 		{
-			var ctx = new MemcachedGLib.Context.from_configuration ("--SERVER=localhost");
+			var ctx = new GMemcached.Context.from_configuration ("--SERVER=localhost");
 
 			ctx.server_cursor ((ctx, instance) => {
 				assert ("localhost" == instance.name ());

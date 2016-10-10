@@ -15,7 +15,7 @@
  * Memcached-GLib.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public errordomain MemcachedGLib.Error
+public errordomain GMemcached.Error
 {
     SUCCESS                          = Memcached.ReturnCode.SUCCESS,
     FAILURE                          = Memcached.ReturnCode.FAILURE,
