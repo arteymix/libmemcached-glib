@@ -3,18 +3,10 @@ libmemcached_glib_sources = [
     'gmemcached-context.vala',
     'gmemcached-context-source.vala',
     'gmemcached-error.vala']
-libmemcached_glib_lib = library('libmemcached-glib', libmemcached_glib_sources,
-                                name_prefix: '',
+libmemcached_glib_lib = library('memcached-glib', libmemcached_glib_sources,
                                 vala_args: '--vapidir=' + meson.current_source_dir() + '/../vapi',
-                                dependencies: [glib, gobject, gio, libmemcached],
-                                install: true)
+                                dependencies: [glib, gobject, gio, libmemcached])
 
 libmemcached_glib = declare_dependency(dependencies: libmemcached,
                                        link_with: libmemcached_glib_lib,
                                        include_directories: include_directories('.'))
-
-pkg_config = import('pkgconfig')
-pkg_config.generate(name: 'libmemcached-glib',
-                    description: 'GLib wrapper around libMemcached',
-                    requires: 'glib-2.0 gobject-2.0 gio-2.0 libmemcached',
-                    libraries: libmemcached_glib_lib)
